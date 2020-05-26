@@ -1,5 +1,6 @@
 import { Anuncio } from "./entidades.js";
 import { RESPONSE } from "../constates/constantes.js";
+import { showSpinner, hideSpinner } from "./spinner.js";
 let arrayData = [];
 let btnGuardar = document.getElementById("btnGuardar");
 let btnEliminar = document.getElementById("btnEliminar");
@@ -19,13 +20,16 @@ btnModificar.addEventListener("click", modifyFetch);
 
 btnEliminar.style.visibility = "hidden";
 btnModificar.style.visibility = "hidden";
-
 function alta() {
   let xhr = new XMLHttpRequest();
+  showSpinner();
   xhr.onreadystatechange = () => {
     if (xhr.readyState !== 4 || xhr.status !== 200) return;
     let dataToJson = JSON.parse(xhr.responseText);
-    if (dataToJson.message === RESPONSE.ALTA_EXITOSA) traer();
+    if (dataToJson.message === RESPONSE.ALTA_EXITOSA) {
+      hideSpinner();
+      traer();
+    }
   };
   xhr.open("POST", "http://localhost:3000/alta");
   xhr.setRequestHeader("content-type", "application/json");
@@ -37,6 +41,7 @@ function alta() {
 function altaFetch() {
   const dataToSend = getFormValues();
   if (!dataToSend) return;
+  showSpinner();
   fetch("http://localhost:3000/alta", {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -44,17 +49,24 @@ function altaFetch() {
   })
     .then((responseText) => responseText.json())
     .then((response) => {
-      if (response.message === RESPONSE.ALTA_EXITOSA) traer();
+      if (response.message === RESPONSE.ALTA_EXITOSA) {
+        hideSpinner();
+        traer();
+      }
     })
     .catch((error) => console.log(error));
 }
 
 function baja() {
   let xhr = new XMLHttpRequest();
+  showSpinner();
   xhr.onreadystatechange = () => {
     if (xhr.readyState !== 4 || xhr.status !== 200) return;
     let dataToJson = JSON.parse(xhr.responseText);
-    if (dataToJson.message === RESPONSE.BAJA_EXITOSA) traer();
+    if (dataToJson.message === RESPONSE.BAJA_EXITOSA) {
+      hideSpinner();
+      traer();
+    }
   };
   xhr.open("POST", "http://localhost:3000/baja");
   xhr.setRequestHeader("content-type", "application/x-www-form-urlencoded");
@@ -65,6 +77,7 @@ function baja() {
 function bajaFetch() {
   const dataToSend = getFormValues();
   if (!dataToSend) return;
+  showSpinner();
   fetch("http://localhost:3000/baja", {
     method: "POST",
     headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -72,7 +85,10 @@ function bajaFetch() {
   })
     .then((responseText) => responseText.json())
     .then((response) => {
-      if (response.message === RESPONSE.BAJA_EXITOSA) traer();
+      if (response.message === RESPONSE.BAJA_EXITOSA) {
+        hideSpinner();
+        traer();
+      }
     })
     .catch((error) => console.log(error));
 }
@@ -80,11 +96,13 @@ function bajaFetch() {
 function traer() {
   reset();
   let xhr = new XMLHttpRequest();
+  showSpinner();
   xhr.onreadystatechange = () => {
     if (xhr.readyState === 4 && xhr.status === 200) {
       let response = JSON.parse(xhr.responseText);
       arrayData = response.data;
       makeTable(arrayData);
+      hideSpinner();
     }
   };
   xhr.open("GET", "http://localhost:3000/traer");
@@ -93,6 +111,7 @@ function traer() {
 
 function traerFetch() {
   reset();
+  showSpinner();
   fetch("http://localhost:3000/traer", {
     method: "GET",
   })
@@ -101,6 +120,7 @@ function traerFetch() {
       if (response.message === RESPONSE.CARGA_EXITOSA) {
         arrayData = response.data;
         makeTable(arrayData);
+        hideSpinner();
       }
     })
     .catch((error) => console.log(error));
@@ -130,6 +150,7 @@ function modifyFetch() {
   } else {
     return console.error("Error al querer modificar, chequear los datos ");
   }
+  showSpinner();
   fetch("http://localhost:3000/modificar", {
     method: "POST",
     headers: { "content-type": "application/json" },
@@ -137,7 +158,10 @@ function modifyFetch() {
   })
     .then((responseText) => responseText.json())
     .then((response) => {
-      if (response.message === RESPONSE.MOD_EXITOSA) traer();
+      if (response.message === RESPONSE.MOD_EXITOSA) {
+        hideSpinner();
+        traer();
+      }
     })
     .catch((error) => console.log(error));
 }

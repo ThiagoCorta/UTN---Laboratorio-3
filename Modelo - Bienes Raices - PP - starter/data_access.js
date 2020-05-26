@@ -39,7 +39,7 @@
         });
         setTimeout(function () {
           cb(response, "Carga Exitosa", array);
-        }, 5);
+        }, 0);
       });
 
       //return array;
@@ -68,7 +68,7 @@
 
           setTimeout(function () {
             cb(response, "Alta Exitosa");
-          }, 5);
+          }, 5000);
         }
       });
     },
@@ -92,7 +92,7 @@
         );
         setTimeout(function () {
           cb(response, "Baja Exitosa");
-        }, 5);
+        }, 5000);
       });
     },
     update: function (cb, response, nuevoObjeto) {
@@ -121,7 +121,7 @@
         );
         setTimeout(function () {
           cb(response, "Modificacion Exitosa");
-        }, 5);
+        }, 5000);
       });
     },
   };
