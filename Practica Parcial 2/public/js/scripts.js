@@ -57,6 +57,7 @@ function traer() {
       let response = JSON.parse(xhr.responseText);
       arrayData = response.data;
       makeTable(arrayData);
+      saveDataOnLocalStorage(arrayData);
       hideSpinner();
     }
   };
@@ -86,7 +87,6 @@ function modify() {
 }
 
 function makeTable(array) {
-  saveDataOnLocalStorage(array);
   let table = document.getElementById("table");
   table.innerHTML = "";
   createCheckboxListarray(array);
@@ -109,9 +109,13 @@ function createHeaders(array) {
   let row = document.createElement("tr");
   for (let key in array[0]) {
     let th = document.createElement("th");
+    let icon = document.createElement("i");
     let title = formatHeader(key);
     let header = document.createTextNode(title);
+    icon.className = "fas fa-sort px-2";
+    th.addEventListener("click", sortTable);
     th.appendChild(header);
+    th.appendChild(icon);
     row.appendChild(th);
   }
   return row;
@@ -121,20 +125,22 @@ function createCheckboxListarray(array) {
   let container = document.getElementById("checkboxDiv");
   if ($("#checkboxDiv").find(".custom-control").length) return;
   for (let key in array[0]) {
-    let name = formatHeader(key);
-    let div = document.createElement("div");
-    let input = document.createElement("input");
-    let label = document.createElement("label");
-    div.className = "custom-control custom-checkbox custom-control-inline";
-    input.className = "custom-control-input";
-    label.className = "custom-control-label";
-    input.type = "checkbox";
-    input.id = name;
-    label.htmlFor = name;
-    label.innerText = name;
-    div.appendChild(input);
-    div.appendChild(label);
-    container.appendChild(div);
+    if (key != "id") {
+      let name = formatHeader(key);
+      let div = document.createElement("div");
+      let input = document.createElement("input");
+      let label = document.createElement("label");
+      div.className = "custom-control custom-checkbox custom-control-inline";
+      input.className = "custom-control-input";
+      label.className = "custom-control-label";
+      input.type = "checkbox";
+      input.id = name;
+      label.htmlFor = name;
+      label.innerText = name;
+      div.appendChild(input);
+      div.appendChild(label);
+      container.appendChild(div);
+    }
   }
   return container;
 }
@@ -142,13 +148,15 @@ function createCheckboxListarray(array) {
 function loadMappedTable() {
   let array = [];
   for (let key in arrayData[0]) {
-    let name = formatHeader(key);
-    let input = document.getElementById(name);
-    array[key] = input.checked;
+    if (key != "id") {
+      let name = formatHeader(key);
+      let input = document.getElementById(name);
+      array[key] = input.checked;
+    }
   }
   mappedArrayData = [...arrayData];
   mappedArrayData = mappedArrayData.map((obj) => {
-    let payload = {};
+    let payload = { id: obj["id"] };
     for (let key in array) if (array[key]) payload[key] = obj[key];
     return payload;
   });
@@ -157,9 +165,11 @@ function loadMappedTable() {
 
 function resetCheckbox() {
   for (let key in arrayData[0]) {
-    let name = formatHeader(key);
-    let input = document.getElementById(name);
-    input.checked = false;
+    if (key != "id") {
+      let name = formatHeader(key);
+      let input = document.getElementById(name);
+      if (input) input.checked = false;
+    }
   }
 }
 
@@ -260,6 +270,33 @@ function setMaxDateToday() {
   document.getElementById("nacimiento").setAttribute("max", today);
 }
 
+function sortTable() {
+  const getCellValue = (tr, idx) =>
+    tr.children[idx].innerText || tr.children[idx].textContent;
+
+  const comparer = (idx, asc) => (a, b) =>
+    ((v1, v2) =>
+      v1 !== "" && v2 !== "" && !isNaN(v1) && !isNaN(v2)
+        ? v1 - v2
+        : v1.toString().localeCompare(v2))(
+      getCellValue(asc ? a : b, idx),
+      getCellValue(asc ? b : a, idx)
+    );
+
+  document.querySelectorAll("tr:first-child th").forEach((td) =>
+    td.addEventListener("click", () => {
+      const table = document.getElementById("table");
+      Array.from(table.querySelectorAll("tr:nth-child(n+2)"))
+        .sort(
+          comparer(
+            Array.from(td.parentNode.children).indexOf(td),
+            (this.asc = !this.asc)
+          )
+        )
+        .forEach((tr) => table.appendChild(tr));
+    })
+  );
+}
 function onInit() {
   document.forms[0].addEventListener("submit", (event) => {
     event.preventDefault();

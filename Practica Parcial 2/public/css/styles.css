@@ -41,6 +41,7 @@ body {
 th {
   background-color: #212121;
   color: #fff;
+  cursor: pointer;
 }
 
 .custom-control-input {
