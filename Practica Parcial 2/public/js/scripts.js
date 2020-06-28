@@ -2,10 +2,10 @@ import { Mascota } from "./entidades.js";
 import { RESPONSE } from "../constates/constantes.js";
 import { showSpinner, hideSpinner } from "./spinner.js";
 const localStorage = window.localStorage;
-let arrayData = [];
 let selectedItem = {};
 let mappedArrayData = [];
 let localStorageData = JSON.parse(localStorage.getItem("arrayData"));
+let arrayData = [...localStorageData];
 
 onInit();
 
@@ -211,7 +211,9 @@ function getFormValues() {
       precio: document.getElementById("precio").value,
       animal: radioPerro ? "Perro" : "Gato",
       raza: document.getElementById("raza").value,
-      fecha_nacimiento: document.getElementById("nacimiento").value,
+      fecha_nacimiento: $("#nacimiento")[0].checkValidity()
+        ? $("#nacimiento")[0].value
+        : null,
       vacuna: document.getElementById("vacunado").value,
     };
     if (checkProperties(object)) return new Mascota(object);
@@ -247,6 +249,17 @@ function saveDataOnLocalStorage(array) {
   localStorage.setItem("arrayData", JSON.stringify(array));
 }
 
+function setMaxDateToday() {
+  let today = new Date();
+  let day = today.getDate();
+  let month = today.getMonth() + 1;
+  let year = today.getFullYear();
+  if (day < 10) day = "0" + day;
+  if (month < 10) month = "0" + month;
+  today = year + "-" + month + "-" + day;
+  document.getElementById("nacimiento").setAttribute("max", today);
+}
+
 function onInit() {
   document.forms[0].addEventListener("submit", (event) => {
     event.preventDefault();
@@ -263,5 +276,6 @@ function onInit() {
   btnCargarTabla.style.display = "none";
   btnModificar.style.display = "none";
   btnEliminar.style.display = "none";
+  setMaxDateToday();
   makeTable(localStorageData);
 }
