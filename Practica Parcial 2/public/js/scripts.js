@@ -154,6 +154,7 @@ function loadMappedTable() {
       array[key] = input.checked;
     }
   }
+
   mappedArrayData = [...arrayData];
   mappedArrayData = mappedArrayData.map((obj) => {
     let payload = { id: obj["id"] };
